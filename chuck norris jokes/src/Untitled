@@ -1,0 +1,18 @@
+getFact = function(){
+  var funny
+  var http = require('http');
+  var chuck = http.createClient(80, 'api.icndb.com');
+  var request = chuck.request('GET', '/jokes/random?limitTo=[nerdy]',
+    {'host': 'api.icndb.com'});
+  request.end();
+  request.on('response', function (response) {
+    response.setEncoding('utf8');
+    response.on('data', function (chunk) {
+      funny = JSON.parse(chunk).value.joke
+      console.log('Joke: ' + funny)
+    })
+  });
+  console.log(funny);
+};
+
+getFact();

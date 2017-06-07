@@ -1,5 +1,6 @@
 'use strict';
 var Alexa = require('alexa-sdk');
+var http = require('http');
 
 var APP_ID = undefined; //OPTIONAL: replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
 var SKILL_NAME = 'My Chuck Norris Jokes';
@@ -19,24 +20,22 @@ var handlers = {
         this.emit('GetFact');
     },
     'GetFact': function () {
+      var funny
       var http = require('http');
-      var cn = http.createClient(80, 'http://api.icndb.com');
-      var request = http.request('GET', '/jokes/random',
-        {'host': 'http://api.icndb.com'});
+      var chuck = http.createClient(80, 'api.icndb.com');
+      var request = chuck.request('GET', '/jokes/random?limitTo=[nerdy]',
+        {'host': 'api.icndb.com'});
         request.end();
         request.on('response', function (response) {
-          console.log('STATUS: ' + response.statusCode);
-          console.log('HEADERS: ' + JSON.stringify(response.headers));
-        response.setEncoding('utf8');
-        response.on('data', function (chunk) {
-          console.log('BODY: ' + chunk);
-        var joke = response.on('data')
+            response.setEncoding('utf8');
+            response.on('data', function (chunk) {
+                console.log('BODY: ' + chunk);
+            funny = JSON.parse(chunk).value.joke;
+            });
         });
-      });
-
         // Create speech output
-      var speechOutput = "Here's your joke: " + joke;
-      this.emit(':tellWithCard', speechOutput, SKILL_NAME, joke)
+      var speechOutput = "Here's your joke: " + funny;
+      this.emit(':tellWithCard', speechOutput, SKILL_NAME, funny)
     },
     'AMAZON.HelpIntent': function () {
         var speechOutput = "You can say tell me a chuck norris joke, or, you can say exit... What can I help you with?";
